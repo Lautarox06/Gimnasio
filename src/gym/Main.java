@@ -4,37 +4,48 @@ import java.util.Scanner;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Clase principal que contiene el método main y la interfaz de usuario por consola.
+ * Maneja el menú, la lectura de datos y captura las excepciones que puedan surgir.
+ * * @author Juampi
+ */
 public class Main {
     private static final Scanner sc = new Scanner(System.in);
     private static final DateTimeFormatter DF = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
+    /**
+     * Punto de entrada de la aplicación.
+     * Inicializa el servicio, carga datos de prueba y lanza el bucle del menú.
+     * @param args Argumentos de consola (no utilizados).
+     */
     public static void main(String[] args) {
         GimnasioService servicio = new GimnasioService();
 
-        // Cargamos algunos datos de prueba para no arrancar vacio
+        // Datos hardcodeados para probar funcionalidades sin cargar todo a mano
         try {
             servicio.altaCliente(new Cliente("12345678", "Ana Perez", Plan.BASICO, LocalDate.now().minusMonths(3)));
             servicio.altaCliente(new Cliente("23456789", "Juan Gomez", Plan.FULL, LocalDate.now().minusMonths(13)));
         } catch (Exception e) {
-            System.out.println("Error cargando datos iniciales: " + e.getMessage());
+            System.out.println("Aviso: No se pudieron cargar los datos de prueba: " + e.getMessage());
         }
 
         int op;
         do {
             mostrarMenu();
-            op = leerEnteroRecursivo("Ingrese opción: "); // Usamos la version recursiva
+            // Usamos lectura recursiva para garantizar que ingrese un número
+            op = leerEnteroRecursivo("Ingrese opción: ");
 
             try {
                 procesarOpcion(op, servicio);
             } catch (SocioNoEncontradoException e) {
-                System.out.println(">> Error de logica: " + e.getMessage());
+                System.out.println(">> Error de lógica: " + e.getMessage());
             } catch (IllegalArgumentException e) {
-                System.out.println(">> Error de validacion: " + e.getMessage());
+                System.out.println(">> Dato inválido: " + e.getMessage());
             } catch (Exception e) {
-                System.out.println(">> Ocurrio un error inesperado: " + e.getMessage());
+                System.out.println(">> Ocurrió un error inesperado: " + e.getMessage());
             }
 
-            // Pausa visual antes de limpiar o seguir
+            // Hacemos una pausa para que el usuario pueda leer el resultado
             if(op != 0) esperarEnter();
 
         } while (op != 0);
@@ -57,6 +68,10 @@ public class Main {
         System.out.println("==================================");
     }
 
+    /**
+     * Distribuye la lógica según la opción elegida en el menú.
+     * Usamos Switch Expression para que el código quede más limpio.
+     */
     private static void procesarOpcion(int op, GimnasioService servicio) {
         switch (op) {
             case 1 -> alta(servicio);
@@ -73,8 +88,16 @@ public class Main {
         }
     }
 
-    // REQUISITO: Ejemplo de recursividad simple
-    // Si el usuario ingresa texto en vez de numero, se llama a si mismo
+    /**
+     * Lee un entero por consola usando recursividad.
+     * <p>
+     * <b>Nota técnica:</b> Cumple el requisito de "Ejemplo de recursividad simple".
+     * Si el usuario escribe texto en lugar de números, capturamos el error y
+     * el método se llama a sí mismo hasta obtener un dato válido.
+     * </p>
+     * * @param prompt Mensaje a mostrar al usuario.
+     * @return Un número entero válido.
+     */
     private static int leerEnteroRecursivo(String prompt) {
         System.out.print(prompt);
         try {
@@ -99,6 +122,7 @@ public class Main {
     private static LocalDate leerFecha(String prompt) {
         System.out.print(prompt);
         String s = sc.nextLine().trim();
+        // Si aprieta enter sin escribir nada, asumimos hoy
         if (s.isEmpty()) return LocalDate.now();
         try {
             return LocalDate.parse(s, DF);
@@ -122,7 +146,7 @@ public class Main {
         };
     }
 
-    // Métodos auxiliares para cada opcion del menu
+    // --- Métodos auxiliares que conectan la consola con el servicio ---
 
     private static void alta(GimnasioService s) {
         System.out.println("-- Nuevo Socio --");
