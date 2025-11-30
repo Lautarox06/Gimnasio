@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Gimnasio:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Gimnasio_jar</output-path>
+    <root id="archive" name="Gimnasio.jar">
+      <element id="module-output" name="Gimnasio" />
+    </root>
+  </artifact>
+</component>
